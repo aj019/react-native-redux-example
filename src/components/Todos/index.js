@@ -2,12 +2,11 @@ import React, {Component} from 'react';
 import {View, Text, Button, StyleSheet, TextInput} from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import {connect} from 'react-redux';
-
+import {add, remove} from '../../actions';
 class Todos extends Component {
   constructor() {
     super();
     this.state = {
-      todos: ['One', 'Two', 'Threee'],
       inputText: '',
     };
   }
@@ -20,23 +19,19 @@ class Todos extends Component {
 
   handleAdd = () => {
     if (this.state.inputText !== '') {
+      this.props.addItem(this.state.inputText);
       this.setState({
-        todos: [...this.state.todos, this.state.inputText],
         inputText: '',
       });
     }
   };
 
   handleDelete = i => {
-    this.setState({
-      todos: [
-        ...this.state.todos.slice(0, i),
-        ...this.state.todos.slice(i + 1),
-      ],
-    });
+    this.props.removeItem(i);
   };
 
   render() {
+    console.log('todos', this.props);
     return (
       <View style={styles.container}>
         <TextInput
@@ -46,7 +41,7 @@ class Todos extends Component {
         />
         <Button onPress={this.handleAdd} title="Add"></Button>
         <View style={styles.list_container}>
-          {this.state.todos.map((todo, i) => (
+          {this.props.todos.map((todo, i) => (
             <View style={styles.todo} key={i}>
               <Text style={styles.todoText}>{todo}</Text>
               <Icon.Button
@@ -97,6 +92,13 @@ const styles = StyleSheet.create({
   },
 });
 
+const mapDispatchToProps = dispatch => {
+  return {
+    addItem: data => dispatch(add(data)),
+    removeItem: data => dispatch(remove(data)),
+  };
+};
+
 const mapStateToProps = store => {
   console.log(store);
   return store;
@@ -104,5 +106,5 @@ const mapStateToProps = store => {
 
 export default connect(
   mapStateToProps,
-  {},
+  mapDispatchToProps,
 )(Todos);
